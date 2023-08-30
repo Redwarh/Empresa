@@ -16,7 +16,7 @@
 <body>
     <h1> Formulario empleados </h1>
     <div class="container">
-        <form class="d-flex" action="" method="post">
+        <form class="d-flex" action="crud_empleados.php" method="post">
             <div class="col">
             <div class="mb-3">
                     <label for="lbl_id" class="form-label"><b>ID</b></label>
@@ -66,6 +66,8 @@
                 </div>
                 <div class="mb-3">
                     <input type="Submit" name="btn_agregar" id="btn_agregar" class="btn btn-primary" value="Agregar">
+                    <input type="Submit" name="btn_modificar" id="btn_modificar" class="btn btn-success" value="Modificar">
+                    <input type="Submit" name="btn_eliminar" id="btn_eliminar" class="btn btn-danger" value="Eliminar">
                 </div>                
             </div>
         </form>
@@ -91,10 +93,10 @@
                     <?php 
                    include("datos_conexion.php");
                    $db_conexion = mysqli_connect($db_host,$db_usr,$db_pass,$db_nombre);
-                   $db_conexion -> real_query ("SELECT e.id_empleados as id,e.codigo_empleado,e.nombres,e.apellidos,e.direccion,e.telefono,p.puesto,e.fecha_nacimiento FROM empleados AS e INNER JOIN puestos AS p ON e.id_puesto = p.id_puesto;");
+                   $db_conexion -> real_query ("SELECT e.id_empleados as id,e.codigo_empleado,e.nombres,e.apellidos,e.direccion,e.telefono,p.puesto,e.fecha_nacimiento,e.id_puesto FROM empleados AS e INNER JOIN puestos AS p ON e.id_puesto = p.id_puesto;");
                   $resultado = $db_conexion -> use_result();
                   while ($fila = $resultado ->fetch_assoc()){
-                    echo"<tr data-id=". $fila['id'] .">";
+                    echo"<tr data-id=". $fila['id'] ." data-idp=". $fila['id_puesto'] .">";
                     echo "<td>". $fila['codigo_empleado']."</td>";
                     echo "<td>". $fila['nombres']."</td>";
                     echo "<td>". $fila['apellidos']."</td>";
@@ -114,33 +116,36 @@
             </table>
         </div>
         </div>
-        <?php
-            if (isset($_POST["btn_agregar"])){
-                include("datos_conexion.php");
-                   $db_conexion = mysqli_connect($db_host,$db_usr,$db_pass,$db_nombre);
-                   $txt_codigo =utf8_decode($_POST["txt_codigo"]);
-                   $txt_nombres =utf8_decode($_POST["txt_nombre"]);
-                   $txt_apellidos =utf8_decode($_POST["txt_apellidos"]);
-                   $txt_direccion =utf8_decode($_POST["txt_direccion"]);
-                   $txt_telefono =utf8_decode($_POST["txt_telefono"]);
-                   $drop_puesto =utf8_decode($_POST["drop_puesto"]);
-                   $txt_fechanac =utf8_decode($_POST["txt_fn"]);
-                   $sql = "INSERT INTO empleados(codigo_empleado,nombres,apellidos,direccion,telefono,fecha_nacimiento,id_puesto) values('". $txt_codigo ."','". $txt_nombres ."','". $txt_apellidos ."','". $txt_direccion ."','". $txt_telefono ."','". $txt_fechanac ."',". $drop_puesto .");";
-                if ($db_conexion->query($sql)===true){
-                    $db_conexion->close();
-                    echo"exito";
-                    header("Refresh:0");
-                }else{
-                    echo"Error" . $sql ."<br>". $db_conexion->close();
-                }
-            }
-            ?>
 
   <!-- Bootstrap JavaScript Libraries -->
+  <script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
     integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
   </script>
+<script>
+    $("#tbl_empleados").on('click','tr td',function (e){
+        var target,id,idp,codigo,nombres,apellidos,direccion,telefono,nacimiento;
+        target = $(event.target);
+        id = target.parent().data('id');
+        idp = target.parent().data('idp');
+        codigo = target.parent('tr').find("td").eq(0).html();
+        nombres = target.parent('tr').find("td").eq(1).html();
+        apellidos = target.parent('tr').find("td").eq(2).html();
+        direccion = target.parent('tr').find("td").eq(3).html();
+        telefono = target.parent('tr').find("td").eq(4).html();
+        nacimiento = target.parent('tr').find("td").eq(6).html();
+        $("#txt_id").val(id);
+        $("#txt_codigo").val(codigo);
+        $("#txt_nombre").val(nombres);
+        $("#txt_apellidos").val(apellidos);
+        $("#txt_direccion").val(direccion);
+        $("#txt_telefono").val(telefono);
+        $("#txt_fn").val(nacimiento);
+        $("#drop_puesto").val(idp);
 
+
+    })
+    </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
     integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
   </script>
